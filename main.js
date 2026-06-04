@@ -35,6 +35,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setupProfilePage();
   setupModal();
   updateTimeGreeting();
+  
+  // Position search controls based on viewport
+  repositionIngredientPanel();
+  window.addEventListener("resize", repositionIngredientPanel);
 });
 
 // Save state to localStorage
@@ -73,21 +77,94 @@ function initTheme() {
   }
 }
 
-document.getElementById("theme-toggle").addEventListener("click", () => {
+// Global theme toggler click
+document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+
+function toggleTheme() {
   const isDark = document.body.classList.toggle("dark");
   localStorage.setItem("mealmagic_theme", isDark ? "dark" : "light");
   document.getElementById("theme-toggle").textContent = isDark ? "Light Mode" : "Dark Mode";
-});
+}
 
-document.getElementById("toggle-bg").addEventListener("click", () => {
-  const hasDarkBg = document.body.classList.toggle("dark-bg");
-  document.getElementById("toggle-bg").textContent = hasDarkBg ? "Light Outer BG" : "Dark Outer BG";
-});
+// --- VIEWPORT PORTAL REPOSITIONING ---
+function repositionIngredientPanel() {
+  const panel = document.getElementById("ingredient-panel");
+  const desktopContainer = document.getElementById("sidebar-discover-controls");
+  const mobileContainer = document.getElementById("mobile-discover-controls");
+  
+  if (!panel) return;
+
+  if (window.innerWidth >= 768) {
+    if (desktopContainer && panel.parentElement !== desktopContainer) {
+      desktopContainer.appendChild(panel);
+    }
+    // Show/hide desktop portal depending on current tab
+    if (state.activePage === "page-discover") {
+      desktopContainer.style.display = "block";
+    } else {
+      desktopContainer.style.display = "none";
+    }
+  } else {
+    if (mobileContainer && panel.parentElement !== mobileContainer) {
+      mobileContainer.appendChild(panel);
+    }
+    // Mobile floating layout handles container displays naturally
+    if (desktopContainer) desktopContainer.style.display = "none";
+  }
+}
+
+// --- NAVIGATION SYSTEM ---
+function setupNavigation() {
+  // Select tabs from both sidebar (desktop) and bottom navigation (mobile)
+  const navButtons = document.querySelectorAll(".sidebar-nav-item, .nav-tab");
+  navButtons.forEach(btn => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
+      const targetPageId = btn.getAttribute("data-target");
+      switchPage(targetPageId);
+    });
+  });
+}
+
+function switchPage(pageId) {
+  state.activePage = pageId;
+
+  // Sync active classes across all navigation elements
+  document.querySelectorAll(".sidebar-nav-item, .nav-tab").forEach(btn => {
+    if (btn.getAttribute("data-target") === pageId) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+
+  // Switch display panel
+  document.querySelectorAll(".app-page").forEach(page => {
+    page.classList.remove("active");
+  });
+  const targetPage = document.getElementById(pageId);
+  if (targetPage) {
+    targetPage.classList.add("active");
+  }
+
+  // Refresh page canvas views
+  if (pageId === "page-pantry") {
+    renderPantryGrid();
+  } else if (pageId === "page-saved") {
+    renderSavedList();
+  } else if (pageId === "page-profile") {
+    renderProfilePage();
+  }
+
+  // Position sidebar portal controls appropriately
+  repositionIngredientPanel();
+}
 
 // --- ONBOARDING FLOW ---
 function setupOnboarding() {
   const container = document.getElementById("onboarding-flow");
   const continueBtn = document.getElementById("continue-onboarding");
+  const backBtn = document.getElementById("back-onboarding");
   const resetBtn = document.getElementById("reset-onboarding");
 
   // Check if onboarding is already completed
@@ -96,16 +173,12 @@ function setupOnboarding() {
     container.style.display = "none";
   } else {
     container.style.display = "flex";
-    showStep(state.onboarding.step);
+    renderOnboardingStep();
   }
 
-  // Step 1: Cuisine selection
+  // Step 1: Cuisine selection clicks
   document.querySelectorAll(".cuisine-card").forEach(card => {
     const cuisine = card.getAttribute("data-cuisine");
-    if (state.onboarding.cuisines.includes(cuisine)) {
-      card.classList.add("selected");
-    }
-
     card.addEventListener("click", () => {
       if (card.classList.contains("selected")) {
         card.classList.remove("selected");
@@ -118,13 +191,9 @@ function setupOnboarding() {
     });
   });
 
-  // Step 2: Dietary selection
+  // Step 2: Dietary toggles clicks
   document.querySelectorAll(".dietary-pill").forEach(pill => {
     const diet = pill.getAttribute("data-diet");
-    if (state.onboarding.diet === diet) {
-      pill.classList.add("selected");
-    }
-
     pill.addEventListener("click", () => {
       document.querySelectorAll(".dietary-pill").forEach(p => p.classList.remove("selected"));
       if (state.onboarding.diet === diet) {
@@ -137,13 +206,9 @@ function setupOnboarding() {
     });
   });
 
-  // Step 3: Skill level selection
+  // Step 3: Skill card clicks
   document.querySelectorAll(".skill-card").forEach(card => {
     const skill = card.getAttribute("data-skill");
-    if (state.onboarding.skill === skill) {
-      card.classList.add("selected");
-    }
-
     card.addEventListener("click", () => {
       document.querySelectorAll(".skill-card").forEach(c => c.classList.remove("selected"));
       card.classList.add("selected");
@@ -152,29 +217,40 @@ function setupOnboarding() {
     });
   });
 
+  // Next / Continue button
   continueBtn.addEventListener("click", () => {
     if (state.onboarding.step === 1) {
       if (state.onboarding.cuisines.length === 0) {
         // Fallback default
         state.onboarding.cuisines.push("Levantine");
-        document.querySelector('[data-cuisine="Levantine"]').classList.add("selected");
+        const card = document.querySelector('[data-cuisine="Levantine"]');
+        if (card) card.classList.add("selected");
       }
       state.onboarding.step = 2;
-      showStep(2);
+      renderOnboardingStep();
     } else if (state.onboarding.step === 2) {
       state.onboarding.step = 3;
-      showStep(3);
+      renderOnboardingStep();
     } else if (state.onboarding.step === 3) {
       if (!state.onboarding.skill) {
         state.onboarding.skill = "Practitioner";
       }
-      // Complete Onboarding
+      // Finish onboarding
       localStorage.setItem("mealmagic_onboarding_completed", "true");
       container.style.display = "none";
-      renderProfilePage(); // refresh profile details with selected coordinates
+      renderProfilePage();
     }
   });
 
+  // Back button
+  backBtn.addEventListener("click", () => {
+    if (state.onboarding.step > 1) {
+      state.onboarding.step--;
+      renderOnboardingStep();
+    }
+  });
+
+  // Dev tools reset onboarding
   resetBtn.addEventListener("click", () => {
     localStorage.removeItem("mealmagic_onboarding_completed");
     state.onboarding.step = 1;
@@ -188,26 +264,80 @@ function setupOnboarding() {
     });
     
     container.style.display = "flex";
-    showStep(1);
+    renderOnboardingStep();
   });
 }
 
-function showStep(stepNum) {
-  document.querySelectorAll(".onboarding-step").forEach(step => {
-    step.classList.remove("active");
-  });
-  const activeStep = document.querySelector(`.onboarding-step[data-step="${stepNum}"]`);
-  if (activeStep) activeStep.classList.add("active");
-
+function renderOnboardingStep() {
+  const step = state.onboarding.step;
+  
+  // Left Panel instructions
+  const indicator = document.getElementById("onboarding-step-indicator");
+  const headline = document.getElementById("onboarding-headline");
+  const subtitle = document.getElementById("onboarding-subtitle");
+  const backBtn = document.getElementById("back-onboarding");
   const continueBtn = document.getElementById("continue-onboarding");
-  if (stepNum === 3) {
-    continueBtn.textContent = "✦ Enter Kitchen";
-  } else {
+
+  if (step === 1) {
+    indicator.textContent = "I / III";
+    headline.innerHTML = `Select your <span>affinities</span>`;
+    subtitle.textContent = "Your culinary foundational coordinates";
+    backBtn.style.display = "none";
     continueBtn.textContent = "Continue";
+  } else if (step === 2) {
+    indicator.textContent = "II / III";
+    headline.innerHTML = `Dietary <span>boundaries</span>`;
+    subtitle.textContent = "Define the parameters of the kitchen";
+    backBtn.style.display = "block";
+    continueBtn.textContent = "Continue";
+  } else if (step === 3) {
+    indicator.textContent = "III / III";
+    headline.innerHTML = `Culinary <span>temperament</span>`;
+    subtitle.textContent = "Select your relationship with fire and knife";
+    backBtn.style.display = "block";
+    continueBtn.textContent = "✦ Enter Kitchen";
   }
+
+  // Right Panel Panes
+  document.querySelectorAll(".onboarding-pane").forEach(pane => {
+    const paneStep = parseInt(pane.getAttribute("data-step"));
+    if (paneStep === step) {
+      pane.classList.add("active");
+    } else {
+      pane.classList.remove("active");
+    }
+  });
+
+  // Synchronize UI selected states
+  document.querySelectorAll(".cuisine-card").forEach(card => {
+    const cuisine = card.getAttribute("data-cuisine");
+    if (state.onboarding.cuisines.includes(cuisine)) {
+      card.classList.add("selected");
+    } else {
+      card.classList.remove("selected");
+    }
+  });
+
+  document.querySelectorAll(".dietary-pill").forEach(pill => {
+    const diet = pill.getAttribute("data-diet");
+    if (state.onboarding.diet === diet) {
+      pill.classList.add("selected");
+    } else {
+      pill.classList.remove("selected");
+    }
+  });
+
+  document.querySelectorAll(".skill-card").forEach(card => {
+    const skill = card.getAttribute("data-skill");
+    if (state.onboarding.skill === skill) {
+      card.classList.add("selected");
+    } else {
+      card.classList.remove("selected");
+    }
+  });
 }
 
-// --- TIME GREETING ---
+// --- DYNAMIC GREETING ---
 function updateTimeGreeting() {
   const greetingEl = document.getElementById("time-greeting");
   if (!greetingEl) return;
@@ -222,41 +352,7 @@ function updateTimeGreeting() {
   }
 }
 
-// --- NAVIGATION ---
-function setupNavigation() {
-  const tabs = document.querySelectorAll(".nav-tab");
-  tabs.forEach(tab => {
-    tab.addEventListener("click", (e) => {
-      e.preventDefault();
-      const targetPageId = tab.getAttribute("data-target");
-      
-      // Update active nav class
-      tabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-
-      // Switch page
-      document.querySelectorAll(".app-page").forEach(page => {
-        page.classList.remove("active");
-      });
-      const targetPage = document.getElementById(targetPageId);
-      if (targetPage) {
-        targetPage.classList.add("active");
-        state.activePage = targetPageId;
-        
-        // Refresh specific page views
-        if (targetPageId === "page-pantry") {
-          renderPantryGrid();
-        } else if (targetPageId === "page-saved") {
-          renderSavedList();
-        } else if (targetPageId === "page-profile") {
-          renderProfilePage();
-        }
-      }
-    });
-  });
-}
-
-// --- DISCOVER PAGE ---
+// --- DISCOVER PAGE LOGIC ---
 function setupDiscoverPage() {
   renderRecipeCards(curatedRecipes, "recipe-list-container");
 
@@ -265,7 +361,7 @@ function setupDiscoverPage() {
   const addBtn = document.getElementById("add-chip-btn");
   const castSpellCta = document.getElementById("cast-spell-cta");
 
-  // Autocomplete / suggestions
+  // Autocomplete suggestions
   searchInput.addEventListener("input", () => {
     const val = searchInput.value.trim().toLowerCase();
     if (!val) {
@@ -286,13 +382,12 @@ function setupDiscoverPage() {
       const info = ingredientsDb[m];
       return `<div class="suggestion-item" data-value="${m}">
         <span>${capitalize(m)}</span>
-        <span style="opacity: 0.5; font-size: 9px;">${info.flavor}</span>
+        <span style="opacity: 0.5; font-size: 10px;">${info.flavor}</span>
       </div>`;
     }).join("");
     suggestionsBox.style.display = "block";
   });
 
-  // Suggestion click
   suggestionsBox.addEventListener("click", (e) => {
     const item = e.target.closest(".suggestion-item");
     if (item) {
@@ -304,7 +399,6 @@ function setupDiscoverPage() {
     }
   });
 
-  // Handle enter key
   searchInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       const val = searchInput.value.trim().toLowerCase();
@@ -316,7 +410,6 @@ function setupDiscoverPage() {
     }
   });
 
-  // Add button click
   addBtn.addEventListener("click", () => {
     const val = searchInput.value.trim().toLowerCase();
     if (val) {
@@ -326,21 +419,18 @@ function setupDiscoverPage() {
     }
   });
 
-  // Close suggestions if clicked outside
   document.addEventListener("click", (e) => {
     if (!searchInput.contains(e.target) && !suggestionsBox.contains(e.target)) {
       suggestionsBox.style.display = "none";
     }
   });
 
-  // Cast Spell CTA Action
   castSpellCta.addEventListener("click", () => {
     if (state.selectedIngredients.length === 0) {
       alert("Please stock or type at least one ingredient to pair.");
       return;
     }
 
-    // Dynamic AI loading feedback animation
     const originalText = castSpellCta.innerHTML;
     castSpellCta.disabled = true;
     castSpellCta.innerHTML = `<span>✦ Aligning coordinates...</span>`;
@@ -353,7 +443,7 @@ function setupDiscoverPage() {
       if (recipe) {
         openRecipeDetail(recipe);
       }
-    }, 1100);
+    }, 1000);
   });
 }
 
@@ -374,7 +464,6 @@ function renderChips() {
     </div>`;
   }).join("");
 
-  // Bind removal triggers
   container.querySelectorAll(".chip-remove").forEach(btn => {
     btn.addEventListener("click", () => {
       const val = btn.getAttribute("data-value");
@@ -389,12 +478,11 @@ function renderRecipeCards(recipesList, containerId) {
   if (!container) return;
 
   if (recipesList.length === 0) {
-    container.innerHTML = `<div class="editorial-subtitle" style="text-align: center; margin-top: 48px; width: 100%;">No recipes fit the parameters</div>`;
+    container.innerHTML = `<div class="editorial-subtitle" style="text-align: center; margin-top: 48px; grid-column: span 2; width: 100%;">No recipes fit the parameters</div>`;
     return;
   }
 
   container.innerHTML = recipesList.map((recipe, index) => {
-    // Generate initials for hero placeholder
     const initials = recipe.title.split(" ").slice(0, 2).map(w => w[0]).join(" & ");
     const isSaved = state.savedRecipeIds.includes(recipe.id);
 
@@ -402,7 +490,7 @@ function renderRecipeCards(recipesList, containerId) {
       <div class="recipe-hero-area" style="background-color: ${recipe.imageBg || '#efe9df'};">
         <div class="recipe-hero-image-placeholder"></div>
         <span class="recipe-hero-engrave">${initials}</span>
-        <button class="save-btn ${isSaved ? 'saved' : ''}" style="position: absolute; top: 12px; right: 12px; z-index: 5;" data-id="${recipe.id}">
+        <button class="save-btn ${isSaved ? 'saved' : ''}" style="position: absolute; top: 16px; right: 16px; z-index: 5;" data-id="${recipe.id}">
           <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
         </button>
       </div>
@@ -420,10 +508,8 @@ function renderRecipeCards(recipesList, containerId) {
     </div>`;
   }).join("");
 
-  // Bind clicks to details
   container.querySelectorAll(".recipe-card").forEach(card => {
     card.addEventListener("click", (e) => {
-      // Don't open if clicked on bookmark button
       if (e.target.closest(".save-btn")) return;
       const id = card.getAttribute("data-id");
       const recipe = curatedRecipes.find(r => r.id === id);
@@ -433,7 +519,6 @@ function renderRecipeCards(recipesList, containerId) {
     });
   });
 
-  // Bind bookmark saves
   container.querySelectorAll(".save-btn").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
@@ -453,7 +538,6 @@ function toggleSaveRecipe(recipeId, buttonEl) {
   }
   saveStateToStorage();
   
-  // Update detail view save button if open for same recipe
   const modalSaveBtn = document.getElementById("recipe-modal-save-btn");
   if (state.currentModalRecipe && state.currentModalRecipe.id === recipeId && modalSaveBtn) {
     if (state.savedRecipeIds.includes(recipeId)) {
@@ -463,7 +547,6 @@ function toggleSaveRecipe(recipeId, buttonEl) {
     }
   }
 
-  // Refresh saved page container if active
   if (state.activePage === "page-saved") {
     renderSavedList();
   }
@@ -485,8 +568,6 @@ function setupPantryPage() {
     if (!name) return;
 
     const days = parseInt(expirySlider.value);
-    
-    // Determine category based on lookup
     const lookup = ingredientsDb[name.toLowerCase()] || { category: "I" };
     
     const newItem = {
@@ -508,15 +589,28 @@ function setupPantryPage() {
 }
 
 function renderPantryGrid() {
-  const container = document.getElementById("pantry-grid-container");
-  if (!container) return;
+  const criticalContainer = document.getElementById("pantry-critical-container");
+  const mediumContainer = document.getElementById("pantry-medium-container");
+  const freshContainer = document.getElementById("pantry-fresh-container");
 
-  if (state.pantry.length === 0) {
-    container.innerHTML = `<div class="editorial-subtitle" style="text-align: center; grid-column: span 2; margin-top: 48px;">Pantry is empty</div>`;
+  if (!criticalContainer || !mediumContainer || !freshContainer) return;
+
+  const criticalItems = state.pantry.filter(item => item.expiryDays <= 2);
+  const mediumItems = state.pantry.filter(item => item.expiryDays > 2 && item.expiryDays <= 6);
+  const freshItems = state.pantry.filter(item => item.expiryDays > 6);
+
+  renderPantrySection(criticalItems, criticalContainer, "No critical items");
+  renderPantrySection(mediumItems, mediumContainer, "No items expiring this week");
+  renderPantrySection(freshItems, freshContainer, "No long-term stock");
+}
+
+function renderPantrySection(items, container, emptyMessage) {
+  if (items.length === 0) {
+    container.innerHTML = `<div class="editorial-subtitle" style="margin-top: 12px; margin-bottom: 12px;">${emptyMessage}</div>`;
     return;
   }
 
-  container.innerHTML = state.pantry.map((item, index) => {
+  container.innerHTML = items.map((item, index) => {
     let expiryClass = "fresh";
     if (item.expiryDays <= 2) {
       expiryClass = "critical";
@@ -545,7 +639,7 @@ function renderPantryGrid() {
     });
   });
 
-  // Bind clicking on pantry card to add it to discover chips directly!
+  // Bind clicking card to push to discover chips
   container.querySelectorAll(".pantry-card").forEach(card => {
     card.addEventListener("click", (e) => {
       if (e.target.closest(".pantry-card-delete")) return;
@@ -554,13 +648,11 @@ function renderPantryGrid() {
       if (item) {
         addIngredientChip(item.name);
         
-        // Add visual feedback
         card.style.transform = "scale(0.95)";
         setTimeout(() => {
           card.style.transform = "";
-          // Automatically switch to discover page to see the chip
-          const discoverTab = document.querySelector('[data-target="page-discover"]');
-          if (discoverTab) discoverTab.click();
+          // Route back to Discover
+          switchPage("page-discover");
         }, 150);
       }
     });
@@ -579,54 +671,11 @@ function renderSavedList() {
   const savedRecipes = curatedRecipes.filter(r => state.savedRecipeIds.includes(r.id));
   
   if (savedRecipes.length === 0) {
-    container.innerHTML = `<div class="editorial-subtitle" style="text-align: center; margin-top: 48px; width: 100%;">No recipes saved yet.</div>`;
+    container.innerHTML = `<div class="editorial-subtitle" style="text-align: center; margin-top: 48px; grid-column: span 2; width: 100%;">No recipes saved yet.</div>`;
     return;
   }
 
-  container.innerHTML = savedRecipes.map((recipe, index) => {
-    const initials = recipe.title.split(" ").slice(0, 2).map(w => w[0]).join(" & ");
-    return `<div class="recipe-card stagger-${(index % 5) + 1}" data-id="${recipe.id}">
-      <div class="recipe-hero-area" style="background-color: ${recipe.imageBg || '#efe9df'};">
-        <div class="recipe-hero-image-placeholder"></div>
-        <span class="recipe-hero-engrave">${initials}</span>
-        <button class="save-btn saved" style="position: absolute; top: 12px; right: 12px; z-index: 5;" data-id="${recipe.id}">
-          <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-        </button>
-      </div>
-      <div class="recipe-card-meta">
-        <div class="recipe-card-details">
-          <span>${recipe.cuisine}</span>
-          <span class="recipe-divider">&middot;</span>
-          <span>${recipe.time}</span>
-          <span class="recipe-divider">&middot;</span>
-          <span>${recipe.servings}</span>
-        </div>
-        <h3 class="recipe-card-title">${recipe.title}</h3>
-        <div class="flavor-badge">${recipe.flavorNote}</div>
-      </div>
-    </div>`;
-  }).join("");
-
-  // Bind clicks
-  container.querySelectorAll(".recipe-card").forEach(card => {
-    card.addEventListener("click", (e) => {
-      if (e.target.closest(".save-btn")) return;
-      const id = card.getAttribute("data-id");
-      const recipe = curatedRecipes.find(r => r.id === id);
-      if (recipe) {
-        openRecipeDetail(recipe);
-      }
-    });
-  });
-
-  // Bind save toggle (unsave)
-  container.querySelectorAll(".save-btn").forEach(btn => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute("data-id");
-      toggleSaveRecipe(id, btn);
-    });
-  });
+  renderRecipeCards(savedRecipes, "saved-recipes-container");
 }
 
 // --- JOURNAL PAGE ---
@@ -666,37 +715,29 @@ function setupProfilePage() {
   renderProfilePage();
 
   const signOutBtn = document.getElementById("sign-out-btn");
-  signOutBtn.addEventListener("click", () => {
-    if (confirm("Reset application state and delete all settings?")) {
-      localStorage.clear();
-      location.reload();
-    }
-  });
+  signOutBtn.addEventListener("click", signOutAccount);
 
-  // Inline settings clicks
+  const sidebarSignOutBtn = document.getElementById("sidebar-signout-btn");
+  sidebarSignOutBtn.addEventListener("click", signOutAccount);
+
+  // Settings redirect links
   document.getElementById("pref-diet-row").addEventListener("click", () => {
-    // Redirect to onboarding step 2
     const onboarding = document.getElementById("onboarding-flow");
     onboarding.style.display = "flex";
     state.onboarding.step = 2;
-    showStep(2);
+    renderOnboardingStep();
   });
 
   document.getElementById("pref-skill-row").addEventListener("click", () => {
-    // Redirect to onboarding step 3
     const onboarding = document.getElementById("onboarding-flow");
     onboarding.style.display = "flex";
     state.onboarding.step = 3;
-    showStep(3);
+    renderOnboardingStep();
   });
 
-  document.getElementById("toggle-theme-row").addEventListener("click", () => {
-    const isDark = document.body.classList.toggle("dark");
-    localStorage.setItem("mealmagic_theme", isDark ? "dark" : "light");
-    document.getElementById("theme-toggle").textContent = isDark ? "Light Mode" : "Dark Mode";
-  });
+  document.getElementById("toggle-theme-row").addEventListener("click", toggleTheme);
 
-  // Username editable
+  // Editable username display click
   const nameDisplay = document.getElementById("profile-username-display");
   nameDisplay.addEventListener("click", () => {
     const input = prompt("Edit username:", state.onboarding.username);
@@ -708,10 +749,21 @@ function setupProfilePage() {
   });
 }
 
+function signOutAccount() {
+  if (confirm("Reset application state and delete all settings?")) {
+    localStorage.clear();
+    location.reload();
+  }
+}
+
 function renderProfilePage() {
   const nameDisplay = document.getElementById("profile-username-display");
   const avatarInitial = document.getElementById("profile-avatar-initial");
   const affinitiesList = document.getElementById("profile-affinities-list");
+  
+  // Sidebar footer updates
+  const sidebarAvatar = document.getElementById("sidebar-avatar-initial");
+  const sidebarName = document.getElementById("sidebar-username-display");
 
   if (!nameDisplay) return;
 
@@ -719,20 +771,25 @@ function renderProfilePage() {
   nameDisplay.textContent = username;
   avatarInitial.textContent = username.charAt(0);
 
+  if (sidebarAvatar) sidebarAvatar.textContent = username.charAt(0);
+  if (sidebarName) sidebarName.textContent = username;
+
   // Render cuisine affinities
   const cuisines = state.onboarding.cuisines.length > 0 ? state.onboarding.cuisines : ["Levantine"];
   affinitiesList.innerHTML = cuisines.map(c => {
     return `<span class="affinity-tag">${c}</span>`;
   }).join("");
 
-  // Add dietary preference as tag if exists
   if (state.onboarding.diet) {
     affinitiesList.innerHTML += `<span class="affinity-tag" style="border-color: var(--accent); color: var(--accent);">${state.onboarding.diet}</span>`;
   }
   
-  // Add skill coordinates as tag
   if (state.onboarding.skill) {
     affinitiesList.innerHTML += `<span class="affinity-tag" style="border-color: var(--accent); color: var(--accent); opacity: 0.8;">${state.onboarding.skill}</span>`;
+    
+    // Update user subtitle in sidebar
+    const sidebarTitle = document.querySelector(".sidebar-usertitle");
+    if (sidebarTitle) sidebarTitle.textContent = state.onboarding.skill;
   }
 }
 
@@ -750,7 +807,6 @@ function setupModal() {
   saveBtn.addEventListener("click", () => {
     if (state.currentModalRecipe) {
       toggleSaveRecipe(state.currentModalRecipe.id, saveBtn);
-      // Refresh current page feed lists
       renderRecipeCards(curatedRecipes, "recipe-list-container");
     }
   });
@@ -779,14 +835,12 @@ function openRecipeDetail(recipe) {
   imgText.textContent = initials;
   flavorBadge.textContent = recipe.flavorNote;
 
-  // Saved bookmark check
   if (state.savedRecipeIds.includes(recipe.id)) {
     saveBtn.classList.add("saved");
   } else {
     saveBtn.classList.remove("saved");
   }
 
-  // Populate ingredients
   ingredientsList.innerHTML = recipe.ingredients.map(ing => {
     return `<div class="recipe-detail-ingredient-item">
       <span class="recipe-detail-ingredient-dot"></span>
@@ -794,7 +848,6 @@ function openRecipeDetail(recipe) {
     </div>`;
   }).join("");
 
-  // Populate steps
   stepsList.innerHTML = recipe.steps.map((step, index) => {
     return `<div class="recipe-detail-step-item">
       <span class="recipe-detail-step-num">${String(index + 1).padStart(2, '0')}</span>

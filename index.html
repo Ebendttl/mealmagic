@@ -8,139 +8,228 @@
 </head>
 <body>
 
-  <div class="app-wrapper">
-    <!-- Desktop Controls for Theme & Onboarding Reset -->
-    <div class="simulator-controls">
-      <button class="control-btn" id="theme-toggle">Dark Mode</button>
-      <button class="control-btn" id="reset-onboarding">Reset Onboarding</button>
-      <button class="control-btn" id="toggle-bg">Dark Outer BG</button>
-    </div>
-
-    <!-- Phone Viewport Emulator -->
-    <div class="phone-viewport">
-      <div class="ambient-orb"></div>
-
-      <!-- ONBOARDING FLOW OVERLAY -->
-      <div class="onboarding-container" id="onboarding-flow">
+  <!-- ROOT APPLICATION SHELL -->
+  <div class="app-layout">
+    
+    <!-- LEFT SIDEBAR (Desktop) -->
+    <aside class="sidebar">
+      <div class="sidebar-top">
+        <div class="wordmark">Meal Magic <span class="wordmark-ai">AI</span></div>
+      </div>
+      
+      <!-- Primary Navigation (Vertical) -->
+      <nav class="sidebar-nav">
+        <button class="sidebar-nav-item active" data-target="page-discover">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <span>Discover</span>
+        </button>
         
-        <!-- Step 1: Cuisine Selection -->
-        <div class="onboarding-step active" data-step="1">
-          <div class="step-counter">I / III</div>
-          <h2 class="editorial-title">Select your <span>affinities</span></h2>
-          <p class="editorial-subtitle">Your culinary foundational coordinates</p>
-          
-          <div class="cuisine-grid">
-            <div class="cuisine-card" data-cuisine="Levantine">
-              <span class="cuisine-emoji">🇱🇧</span>
-              <div>
-                <div class="cuisine-name">Levantine</div>
-                <div class="cuisine-sample">Tahini · Aubergine</div>
-              </div>
-            </div>
-            <div class="cuisine-card" data-cuisine="Iberian">
-              <span class="cuisine-emoji">🇪🇸</span>
-              <div>
-                <div class="cuisine-name">Iberian</div>
-                <div class="cuisine-sample">Pimentón · Olive Oil</div>
-              </div>
-            </div>
-            <div class="cuisine-card" data-cuisine="Japanese">
-              <span class="cuisine-emoji">🇯🇵</span>
-              <div>
-                <div class="cuisine-name">Japanese</div>
-                <div class="cuisine-sample">Kombu · Shiitake</div>
-              </div>
-            </div>
-            <div class="cuisine-card" data-cuisine="Italian">
-              <span class="cuisine-emoji">🇮🇹</span>
-              <div>
-                <div class="cuisine-name">Italian</div>
-                <div class="cuisine-sample">Fennel · Balsamic</div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <button class="sidebar-nav-item" data-target="page-pantry">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+            <path d="M2 17l10 5 10-5"></path>
+            <path d="M2 12l10 5 10-5"></path>
+          </svg>
+          <span>Pantry</span>
+        </button>
 
-        <!-- Step 2: Dietary preferences -->
-        <div class="onboarding-step" data-step="2">
-          <div class="step-counter">II / III</div>
-          <h2 class="editorial-title">Dietary <span>boundaries</span></h2>
-          <p class="editorial-subtitle">Define the parameters of the kitchen</p>
-          
-          <div class="dietary-group">
-            <button class="dietary-pill" data-diet="Vegetarian">Vegetarian</button>
-            <button class="dietary-pill" data-diet="Vegan">Vegan</button>
-            <button class="dietary-pill" data-diet="Gluten-Free">Gluten-Free</button>
-            <button class="dietary-pill" data-diet="Pescatarian">Pescatarian</button>
-          </div>
-        </div>
+        <button class="sidebar-nav-item" data-target="page-saved">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span>Saved</span>
+        </button>
 
-        <!-- Step 3: Kitchen Skill level -->
-        <div class="onboarding-step" data-step="3">
-          <div class="step-counter">III / III</div>
-          <h2 class="editorial-title">Culinary <span>temperament</span></h2>
-          <p class="editorial-subtitle">Select your relationship with fire and knife</p>
-          
-          <div class="skill-list">
-            <div class="skill-card" data-skill="Novice">
-              <div class="skill-icon">🫖</div>
-              <div class="skill-info">
-                <h3 class="skill-name">Novice</h3>
-                <p class="skill-desc">Patient assembling, gentle heat, minor chopping.</p>
-              </div>
-            </div>
-            <div class="skill-card" data-skill="Practitioner">
-              <div class="skill-icon">🔪</div>
-              <div class="skill-info">
-                <h3 class="skill-name">Practitioner</h3>
-                <p class="skill-desc">Comfortable emulsifying, temperature management, direct roasting.</p>
-              </div>
-            </div>
-            <div class="skill-card" data-skill="Alchemist">
-              <div class="skill-icon">🔥</div>
-              <div class="skill-info">
-                <h3 class="skill-name">Alchemist</h3>
-                <p class="skill-desc">Fermentation, acid pairing, thermal shocks, reduction mastery.</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <button class="sidebar-nav-item" data-target="page-journal">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          <span>Journal</span>
+        </button>
 
-        <!-- Bottom continue CTA -->
-        <button class="onboarding-cta" id="continue-onboarding">Continue</button>
+        <button class="sidebar-nav-item" data-target="page-profile">
+          <svg class="nav-icon" viewBox="0 0 24 24">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>Profile</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Portal for Discover controls (Desktop only) -->
+      <div class="sidebar-discover-portal" id="sidebar-discover-controls">
+        <!-- Ingredient panel will be dynamically appended here on desktop -->
       </div>
 
-      <!-- MAIN APP PAGES CONTENT -->
-      <div class="screen-content" id="screen-content">
+      <!-- Profile & Signout Row (Desktop footer) -->
+      <div class="sidebar-footer">
+        <div class="sidebar-profile-chip">
+          <div class="sidebar-avatar" id="sidebar-avatar-initial">C</div>
+          <div class="sidebar-profile-text">
+            <div class="sidebar-username" id="sidebar-username-display">Chef</div>
+            <div class="sidebar-usertitle">Practitioner</div>
+          </div>
+          <button class="sidebar-signout" id="sidebar-signout-btn" aria-label="Sign Out">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <polyline points="16 17 21 12 16 7"></polyline>
+              <line x1="21" y1="12" x2="9" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </aside>
 
+    <!-- MAIN CANVAS AREA -->
+    <main class="main-content">
+      
+      <!-- Top header bar for controls -->
+      <header class="main-header">
+        <div class="header-actions">
+          <button class="control-btn" id="theme-toggle">Dark Mode</button>
+          <button class="control-btn" id="reset-onboarding">Reset Onboarding</button>
+        </div>
+      </header>
+
+      <!-- ONBOARDING FLOW OVERLAY (Web Two-Panel & Mobile Fallback) -->
+      <div class="onboarding-container" id="onboarding-flow">
+        <div class="onboarding-wrapper">
+          
+          <!-- Left Panel (Sticky instructions) -->
+          <div class="onboarding-left">
+            <div class="step-counter" id="onboarding-step-indicator">I / III</div>
+            <h2 class="editorial-title" id="onboarding-headline">Select your <span>affinities</span></h2>
+            <p class="editorial-subtitle" id="onboarding-subtitle">Your culinary foundational coordinates</p>
+            
+            <div class="onboarding-navigation-controls">
+              <button class="onboarding-cta" id="continue-onboarding">Continue</button>
+              <button class="control-btn" id="back-onboarding" style="display: none; width: 100%; margin-top: 12px; height: 44px;">← Back</button>
+            </div>
+          </div>
+
+          <!-- Divider line (Desktop) -->
+          <div class="onboarding-divider"></div>
+
+          <!-- Right Panel (Scrollable selection grids) -->
+          <div class="onboarding-right">
+            
+            <!-- Step 1 Pane: Cuisines -->
+            <div class="onboarding-pane active" data-step="1">
+              <div class="cuisine-grid">
+                <div class="cuisine-card" data-cuisine="Levantine">
+                  <span class="cuisine-emoji">🇱🇧</span>
+                  <div>
+                    <div class="cuisine-name">Levantine</div>
+                    <div class="cuisine-sample">Tahini · Aubergine</div>
+                  </div>
+                </div>
+                <div class="cuisine-card" data-cuisine="Iberian">
+                  <span class="cuisine-emoji">🇪🇸</span>
+                  <div>
+                    <div class="cuisine-name">Iberian</div>
+                    <div class="cuisine-sample">Pimentón · Olive Oil</div>
+                  </div>
+                </div>
+                <div class="cuisine-card" data-cuisine="Japanese">
+                  <span class="cuisine-emoji">🇯🇵</span>
+                  <div>
+                    <div class="cuisine-name">Japanese</div>
+                    <div class="cuisine-sample">Kombu · Shiitake</div>
+                  </div>
+                </div>
+                <div class="cuisine-card" data-cuisine="Italian">
+                  <span class="cuisine-emoji">🇮🇹</span>
+                  <div>
+                    <div class="cuisine-name">Italian</div>
+                    <div class="cuisine-sample">Fennel · Balsamic</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Step 2 Pane: Dietary boundaries -->
+            <div class="onboarding-pane" data-step="2">
+              <div class="dietary-wrap-group">
+                <button class="dietary-pill" data-diet="Vegetarian">Vegetarian</button>
+                <button class="dietary-pill" data-diet="Vegan">Vegan</button>
+                <button class="dietary-pill" data-diet="Gluten-Free">Gluten-Free</button>
+                <button class="dietary-pill" data-diet="Pescatarian">Pescatarian</button>
+              </div>
+            </div>
+
+            <!-- Step 3 Pane: Skill temperament -->
+            <div class="onboarding-pane" data-step="3">
+              <div class="skill-grid">
+                <div class="skill-card" data-skill="Novice">
+                  <div class="skill-icon">🫖</div>
+                  <div class="skill-info">
+                    <h3 class="skill-name">Novice</h3>
+                    <p class="skill-desc">Patient assembling, gentle heat, minor chopping.</p>
+                  </div>
+                </div>
+                <div class="skill-card" data-skill="Practitioner">
+                  <div class="skill-icon">🔪</div>
+                  <div class="skill-info">
+                    <h3 class="skill-name">Practitioner</h3>
+                    <p class="skill-desc">Comfortable emulsifying, temperature management, direct roasting.</p>
+                  </div>
+                </div>
+                <div class="skill-card" data-skill="Alchemist">
+                  <div class="skill-icon">🔥</div>
+                  <div class="skill-info">
+                    <h3 class="skill-name">Alchemist</h3>
+                    <p class="skill-desc">Fermentation, acid pairing, thermal shocks, reduction mastery.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INGREDIENT PANEL (Single source of DOM, teleported dynamically via JS) -->
+      <div class="ingredient-input-panel" id="ingredient-panel">
+        <div class="ingredient-chips-container" id="chips-container">
+          <!-- Populated dynamically -->
+        </div>
+        
+        <div class="input-container">
+          <input type="text" class="styled-input" id="ingredient-search-input" placeholder="Stock ingredient (e.g. Garlic)..." autocomplete="off">
+          <button class="add-ingredient-btn" id="add-chip-btn" aria-label="Add Ingredient">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+          </button>
+          <div class="suggestions-list" id="suggestions-container" style="display: none;"></div>
+        </div>
+
+        <button class="cast-spell-btn" id="cast-spell-cta">
+          <span>✦ Cast spell</span>
+        </button>
+      </div>
+
+      <!-- PAGES CANVAS CONTAINER -->
+      <div class="pages-canvas">
+        
         <!-- PAGE 1: DISCOVER -->
         <div class="app-page active" id="page-discover">
+          <div class="ambient-orb"></div>
           <h1 class="discover-header">
             Good <span id="time-greeting">afternoon</span> /<br>
             What shall we <span class="cook-italic">cook</span>?
           </h1>
           
-          <div class="recipe-stack" id="recipe-list-container">
-            <!-- Dynamically populated recipe cards -->
+          <div class="recipe-grid-container" id="recipe-list-container">
+            <!-- Populated dynamically (2-col grid) -->
           </div>
 
-          <!-- Pinned Floating Ingredient Input Card -->
-          <div class="floating-input-panel">
-            <div class="ingredient-chips-container" id="chips-container">
-              <!-- Dynamically populated ingredient chips -->
-            </div>
-            
-            <div class="input-container">
-              <input type="text" class="styled-input" id="ingredient-search-input" placeholder="Type ingredient (e.g., Aubergine)..." autocomplete="off">
-              <button class="add-ingredient-btn" id="add-chip-btn" aria-label="Add Ingredient">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-              </button>
-              <div class="suggestions-list" id="suggestions-container" style="display: none;"></div>
-            </div>
-
-            <button class="cast-spell-btn" id="cast-spell-cta">
-              <span>✦ Cast spell</span>
-            </button>
+          <!-- Mobile Portal for Discover controls -->
+          <div class="mobile-discover-portal" id="mobile-discover-controls">
+            <!-- Ingredient panel will sit here on mobile -->
           </div>
         </div>
 
@@ -149,34 +238,55 @@
           <h2 class="editorial-title">Your <span>pantry</span></h2>
           <p class="editorial-subtitle">Inventory & Expiry coordinates</p>
 
-          <!-- Quick add form -->
+          <!-- Quick Stock Panel -->
           <div class="quick-add-panel">
             <span class="quick-add-title">Stock new ingredient</span>
-            <div class="input-container">
-              <input type="text" class="styled-input" id="pantry-name-input" placeholder="Ingredient name..." autocomplete="off">
-            </div>
-            <div class="expiry-slider-container">
-              <div class="expiry-slider-labels">
-                <span>Lifespan (Expiry)</span>
-                <span id="expiry-days-label">5 days</span>
+            <div class="quick-add-row">
+              <input type="text" class="styled-input" id="pantry-name-input" placeholder="Ingredient name (e.g. Fennel)..." autocomplete="off">
+              <div class="expiry-slider-container">
+                <div class="expiry-slider-labels">
+                  <span>Lifespan (Expiry)</span>
+                  <span id="expiry-days-label">5 days</span>
+                </div>
+                <input type="range" class="expiry-range" id="pantry-expiry-slider" min="1" max="14" value="5">
               </div>
-              <input type="range" class="expiry-range" id="pantry-expiry-slider" min="1" max="14" value="5">
+              <button class="onboarding-cta" id="add-pantry-item-btn" style="min-height: 44px; padding: 10px; width: 140px; margin-top: 0;">✦ Stock Item</button>
             </div>
-            <button class="onboarding-cta" id="add-pantry-item-btn" style="min-height: 38px; padding: 10px;">✦ Stock Item</button>
           </div>
 
-          <div class="pantry-grid" id="pantry-grid-container">
-            <!-- Dynamically populated pantry ingredients -->
+          <!-- Chronological Pantry Sections (Spacious desktop grids) -->
+          <div class="pantry-sections-wrapper">
+            
+            <div class="pantry-section" id="section-critical">
+              <h3 class="pantry-section-header">Use today <span>(critical)</span></h3>
+              <div class="pantry-grid" id="pantry-critical-container">
+                <!-- Red-bordered elements -->
+              </div>
+            </div>
+
+            <div class="pantry-section" id="section-medium">
+              <h3 class="pantry-section-header">This week <span>(medium)</span></h3>
+              <div class="pantry-grid" id="pantry-medium-container">
+                <!-- Amber-bordered elements -->
+              </div>
+            </div>
+
+            <div class="pantry-section" id="section-fresh">
+              <h3 class="pantry-section-header font-accents">Fresh <span>(long lifespan)</span></h3>
+              <div class="pantry-grid" id="pantry-fresh-container">
+                <!-- Green-bordered elements -->
+              </div>
+            </div>
+
           </div>
         </div>
 
-        <!-- PAGE 3: SAVED RECIPES -->
+        <!-- PAGE 3: SAVED -->
         <div class="app-page" id="page-saved">
           <h2 class="editorial-title">Saved <span>recipes</span></h2>
           <p class="editorial-subtitle">Your personalized kitchen manual</p>
-          <div class="recipe-stack" id="saved-recipes-container">
-            <!-- Saved recipes cards populate here -->
-            <div class="editorial-subtitle" style="text-align: center; margin-top: 48px; width: 100%;">No recipes saved yet.</div>
+          <div class="recipe-grid-container" id="saved-recipes-container">
+            <!-- Bookmarked recipes cards -->
           </div>
         </div>
 
@@ -184,22 +294,22 @@
         <div class="app-page" id="page-journal">
           <h2 class="editorial-title">Kitchen <span>journal</span></h2>
           <p class="editorial-subtitle">A record of fire, taste & adjustments</p>
-          
           <div class="journal-list" id="journal-container">
-            <!-- Beautiful journal posts -->
+            <!-- Poetic entries -->
           </div>
         </div>
 
         <!-- PAGE 5: PROFILE -->
         <div class="app-page" id="page-profile">
-          <div class="profile-avatar-row">
-            <div class="profile-avatar" id="profile-avatar-initial">C</div>
-            <h2 class="profile-username" id="profile-username-display">Chef</h2>
-            
-            <div>
-              <div class="profile-affinities-title">Foundational Affinities</div>
-              <div class="profile-affinities" id="profile-affinities-list">
-                <!-- Selected cuisine tags -->
+          <div class="profile-header-card">
+            <div class="profile-avatar-row">
+              <div class="profile-avatar" id="profile-avatar-initial">C</div>
+              <div>
+                <h2 class="profile-username" id="profile-username-display" style="cursor: pointer;">Chef</h2>
+                <div class="profile-affinities-title">Foundational Affinities</div>
+                <div class="profile-affinities" id="profile-affinities-list">
+                  <!-- Selected cuisine tags -->
+                </div>
               </div>
             </div>
           </div>
@@ -247,94 +357,85 @@
 
       </div>
 
-      <!-- RECIPE DETAIL VIEW (MODAL COVER) -->
-      <div class="recipe-modal" id="recipe-modal-view">
-        <div class="recipe-modal-header">
-          <button class="modal-close-btn" id="close-modal-btn" aria-label="Close details">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-          </button>
-          <div class="recipe-card-details" style="gap: 12px;">
-            <button class="save-btn" id="recipe-modal-save-btn" aria-label="Save Recipe">
-              <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-            </button>
-          </div>
-        </div>
-        
-        <div class="recipe-modal-content">
-          <div class="recipe-detail-image-box" id="modal-image-box">
-            <span class="recipe-hero-engrave" id="modal-image-text">A & S</span>
-            <div class="flavor-badge recipe-detail-badge" id="modal-flavor-badge">EARTHY</div>
-          </div>
-          
-          <h2 class="editorial-title" style="font-size: 28px; margin-bottom: 4px;" id="modal-title">Smoked Aubergine & Sesame</h2>
-          <div class="recipe-card-details" style="margin-bottom: 20px;" id="modal-meta">
-            Levantine &middot; 45 min &middot; 2 servings
-          </div>
-          
-          <p class="recipe-detail-desc" id="modal-desc">
-            Charred aubergine flesh emulsified with toasted sesame paste, finished with cold-pressed olive oil.
-          </p>
-          
-          <h3 class="recipe-detail-section-title">Ingredients</h3>
-          <div class="recipe-detail-ingredients" id="modal-ingredients-list">
-            <!-- Populated dynamically -->
-          </div>
-          
-          <h3 class="recipe-detail-section-title">Preparation</h3>
-          <div class="recipe-detail-steps" id="modal-steps-list">
-            <!-- Populated dynamically -->
-          </div>
-        </div>
+    </main>
+  </div>
+
+  <!-- BOTTOM NAVIGATION BAR (Mobile only) -->
+  <nav class="bottom-nav">
+    <button class="nav-tab active" data-target="page-discover">
+      <svg viewBox="0 0 24 24">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+      <span>DISCOVER</span>
+    </button>
+    <button class="nav-tab" data-target="page-pantry">
+      <svg viewBox="0 0 24 24">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+        <path d="M2 17l10 5 10-5"></path>
+        <path d="M2 12l10 5 10-5"></path>
+      </svg>
+      <span>PANTRY</span>
+    </button>
+    <button class="nav-tab" data-target="page-saved">
+      <svg viewBox="0 0 24 24">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span>SAVED</span>
+    </button>
+    <button class="nav-tab" data-target="page-journal">
+      <svg viewBox="0 0 24 24">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+      </svg>
+      <span>JOURNAL</span>
+    </button>
+    <button class="nav-tab" data-target="page-profile">
+      <svg viewBox="0 0 24 24">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+        <circle cx="12" cy="7" r="4"></circle>
+      </svg>
+      <span>PROFILE</span>
+    </button>
+  </nav>
+
+  <!-- RECIPE DETAIL VIEW (MODAL COVER) -->
+  <div class="recipe-modal" id="recipe-modal-view">
+    <div class="recipe-modal-header">
+      <button class="modal-close-btn" id="close-modal-btn" aria-label="Close details">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+      <div class="recipe-card-details" style="gap: 12px;">
+        <button class="save-btn" id="recipe-modal-save-btn" aria-label="Save Recipe">
+          <svg viewBox="0 0 24 24"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+        </button>
       </div>
-
-      <!-- BOTTOM NAVIGATION BAR (5 Tabs) -->
-      <nav class="bottom-nav">
-        <!-- Discover Tab -->
-        <button class="nav-tab active" data-target="page-discover">
-          <svg viewBox="0 0 24 24">
-            <circle cx="11" cy="11" r="8"></circle>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-          </svg>
-          <span>DISCOVER</span>
-        </button>
-        
-        <!-- Pantry Tab -->
-        <button class="nav-tab" data-target="page-pantry">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
-            <path d="M2 17l10 5 10-5"></path>
-            <path d="M2 12l10 5 10-5"></path>
-          </svg>
-          <span>PANTRY</span>
-        </button>
-
-        <!-- Saved Tab -->
-        <button class="nav-tab" data-target="page-saved">
-          <svg viewBox="0 0 24 24">
-            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-          </svg>
-          <span>SAVED</span>
-        </button>
-
-        <!-- Journal Tab -->
-        <button class="nav-tab" data-target="page-journal">
-          <svg viewBox="0 0 24 24">
-            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
-          </svg>
-          <span>JOURNAL</span>
-        </button>
-
-        <!-- Profile Tab -->
-        <button class="nav-tab" data-target="page-profile">
-          <svg viewBox="0 0 24 24">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-          <span>PROFILE</span>
-        </button>
-      </nav>
-
+    </div>
+    
+    <div class="recipe-modal-content">
+      <div class="recipe-detail-image-box" id="modal-image-box">
+        <span class="recipe-hero-engrave" id="modal-image-text">A & S</span>
+        <div class="flavor-badge recipe-detail-badge" id="modal-flavor-badge">EARTHY</div>
+      </div>
+      
+      <h2 class="editorial-title" style="font-size: 28px; margin-bottom: 4px;" id="modal-title">Smoked Aubergine & Sesame</h2>
+      <div class="recipe-card-details" style="margin-bottom: 20px;" id="modal-meta">
+        Levantine &middot; 45 min &middot; 2 servings
+      </div>
+      
+      <p class="recipe-detail-desc" id="modal-desc">
+        Charred aubergine flesh emulsified with toasted sesame paste, finished with cold-pressed olive oil.
+      </p>
+      
+      <h3 class="recipe-detail-section-title">Ingredients</h3>
+      <div class="recipe-detail-ingredients" id="modal-ingredients-list">
+        <!-- Populated dynamically -->
+      </div>
+      
+      <h3 class="recipe-detail-section-title">Preparation</h3>
+      <div class="recipe-detail-steps" id="modal-steps-list">
+        <!-- Populated dynamically -->
+      </div>
     </div>
   </div>
 
