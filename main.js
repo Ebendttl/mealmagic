@@ -98,11 +98,9 @@ function repositionIngredientPanel() {
     if (desktopContainer && panel.parentElement !== desktopContainer) {
       desktopContainer.appendChild(panel);
     }
-    // Show/hide desktop portal depending on current tab
-    if (state.activePage === "page-discover") {
+    // Always show the discover controls panel in the left sidebar on desktop
+    if (desktopContainer) {
       desktopContainer.style.display = "block";
-    } else {
-      desktopContainer.style.display = "none";
     }
   } else {
     if (mobileContainer && panel.parentElement !== mobileContainer) {
@@ -115,8 +113,8 @@ function repositionIngredientPanel() {
 
 // --- NAVIGATION SYSTEM ---
 function setupNavigation() {
-  // Select tabs from both sidebar (desktop) and bottom navigation (mobile)
-  const navButtons = document.querySelectorAll(".sidebar-nav-item, .nav-tab");
+  // Select tabs from sidebar, bottom navigation, and the footer links
+  const navButtons = document.querySelectorAll(".sidebar-nav-item, .nav-tab, .footer-link");
   navButtons.forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
