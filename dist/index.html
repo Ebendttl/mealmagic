@@ -8,8 +8,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&family=Cormorant+Garamond:ital,wght@1,400;1,600;1,700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
-  <script type="module" crossorigin src="/assets/index-bMK3LqTr.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-Vf_t9CCo.css">
+  <script type="module" crossorigin src="/assets/index-Zh_4FT_M.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-2k6dv0-p.css">
 </head>
 <body>
 
@@ -233,6 +233,16 @@
             Good <span id="time-greeting">afternoon</span> /<br>
             What shall we <span class="cook-italic">cook</span>?
           </h1>
+
+          <!-- Mystical Oracle Callout Banner -->
+          <div class="oracle-banner">
+            <div class="oracle-banner-content">
+              <span class="oracle-badge">✦ Mystical Consultation</span>
+              <h3 class="oracle-banner-title">Consult the Culinary Oracle</h3>
+              <p class="oracle-banner-desc">Draw three gastronomic tarot cards to reveal a pairing omen and manifest a unique recipe.</p>
+            </div>
+            <button class="oracle-banner-btn" id="open-oracle-btn">✦ Draw Cards</button>
+          </div>
           
           <div class="recipe-grid-container" id="recipe-list-container">
             <!-- Populated dynamically (2-col grid) -->
@@ -480,6 +490,79 @@
       <h3 class="recipe-detail-section-title">Preparation</h3>
       <div class="recipe-detail-steps" id="modal-steps-list">
         <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- CULINARY ORACLE MODAL (Chamber of Pairings) -->
+  <div class="oracle-modal" id="oracle-modal">
+    <div class="oracle-modal-header">
+      <span class="oracle-modal-title">✦ The Culinary Oracle</span>
+      <button class="modal-close-btn" id="close-oracle-btn" aria-label="Close Oracle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+    <div class="oracle-modal-content">
+      <p class="oracle-instructions">Focus on your culinary intent, then click each card to flip and reveal the pairing.</p>
+      
+      <div class="tarot-spread">
+        <!-- Card 1: Base -->
+        <div class="tarot-card-container">
+          <span class="tarot-card-label">The Vessel (Base)</span>
+          <div class="tarot-card" id="tarot-card-0" data-index="0">
+            <div class="tarot-card-inner">
+              <div class="tarot-card-back">
+                <div class="tarot-symbol">✦</div>
+              </div>
+              <div class="tarot-card-front" id="tarot-front-0">
+                <div class="tarot-card-archetype">The Altar</div>
+                <div class="tarot-card-monogram">R</div>
+                <div class="tarot-card-title">Rosemary</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Catalyst -->
+        <div class="tarot-card-container">
+          <span class="tarot-card-label">The Catalyst (Flavor)</span>
+          <div class="tarot-card" id="tarot-card-1" data-index="1">
+            <div class="tarot-card-inner">
+              <div class="tarot-card-back">
+                <div class="tarot-symbol">✦</div>
+              </div>
+              <div class="tarot-card-front" id="tarot-front-1">
+                <div class="tarot-card-archetype">The Catalyst</div>
+                <div class="tarot-card-monogram">H</div>
+                <div class="tarot-card-title">Honey</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: Accent -->
+        <div class="tarot-card-container">
+          <span class="tarot-card-label">The Accent (Finish)</span>
+          <div class="tarot-card" id="tarot-card-2" data-index="2">
+            <div class="tarot-card-inner">
+              <div class="tarot-card-back">
+                <div class="tarot-symbol">✦</div>
+              </div>
+              <div class="tarot-card-front" id="tarot-front-2">
+                <div class="tarot-card-archetype">The Whisper</div>
+                <div class="tarot-card-monogram">S</div>
+                <div class="tarot-card-title">Sea Salt</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Prophecy details -->
+      <div class="oracle-prophecy" id="oracle-prophecy">
+        <div class="prophecy-title">The Culinary Prophecy</div>
+        <p class="prophecy-text" id="prophecy-text">Select and flip your cards to begin the consultation...</p>
+        <button class="manifest-recipe-btn" id="manifest-recipe-btn" disabled>✦ Manifest Alchemical Recipe</button>
       </div>
     </div>
   </div>
