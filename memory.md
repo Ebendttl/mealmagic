@@ -60,6 +60,8 @@ const state = {
 
 ### 4.1 Onboarding Flow
 *   **UI/UX:** A multi-step introductory card sequence (Step 1: Cuisines; Step 2: Diets; Step 3: Skill).
+*   **Layout Behavior:** Styled as a viewport-fixed full-screen overlay (`position: fixed`) covering the sidebar and navigation. This prevents clicking sidebar navigation items prior to completing the onboarding setup.
+*   **Settings Interactivity:** A close button (`#close-onboarding-btn`) is displayed at the top right of the overlay, but *only* if the onboarding has already been completed once. This allows returning users to dismiss edit modals without having to click through all wizard steps.
 *   **State Integration:** Clicks write directly to `state.onboarding`.
 *   **Persistence:** Saved to `localStorage` under `mealmagic_state`.
 *   **Reset functionality:** A "Reset Onboarding" button is available in the header and profile page to clear stored configurations and reload.

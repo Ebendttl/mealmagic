@@ -164,6 +164,7 @@ function setupOnboarding() {
   const continueBtn = document.getElementById("continue-onboarding");
   const backBtn = document.getElementById("back-onboarding");
   const resetBtn = document.getElementById("reset-onboarding");
+  const closeBtn = document.getElementById("close-onboarding-btn");
 
   // Check if onboarding is already completed
   const completed = localStorage.getItem("mealmagic_onboarding_completed") === "true";
@@ -172,6 +173,12 @@ function setupOnboarding() {
   } else {
     container.style.display = "flex";
     renderOnboardingStep();
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      container.style.display = "none";
+    });
   }
 
   // Step 1: Cuisine selection clicks
@@ -268,6 +275,13 @@ function setupOnboarding() {
 
 function renderOnboardingStep() {
   const step = state.onboarding.step;
+  
+  // Toggle close button visibility if onboarding is already completed
+  const closeBtn = document.getElementById("close-onboarding-btn");
+  if (closeBtn) {
+    const completed = localStorage.getItem("mealmagic_onboarding_completed") === "true";
+    closeBtn.style.display = completed ? "flex" : "none";
+  }
   
   // Left Panel instructions
   const indicator = document.getElementById("onboarding-step-indicator");

@@ -830,7 +830,7 @@ body.dark .flavor-badge {
 
 /* ONBOARDING FLOW — TWO PANEL DESKTOP SPEC */
 .onboarding-container {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
@@ -839,6 +839,35 @@ body.dark .flavor-badge {
   z-index: 200;
   overflow-y: auto;
   transition: background-color 0.3s ease;
+}
+
+.onboarding-close-btn {
+  position: fixed;
+  top: 24px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  z-index: 210;
+  border-radius: 50%;
+  transition: background-color 0.2s ease;
+}
+
+.onboarding-close-btn:hover {
+  background-color: var(--surface);
+}
+
+.onboarding-close-btn svg {
+  width: 24px;
+  height: 24px;
+  stroke: currentColor;
+  stroke-width: 1.5;
 }
 
 .onboarding-wrapper {
