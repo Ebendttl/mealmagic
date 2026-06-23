@@ -2247,3 +2247,356 @@ body {
     gap: 12px 18px;
   }
 }
+
+/* ==========================================================================
+   15. Mystical Culinary Oracle Component
+   ========================================================================== */
+.oracle-banner {
+  background: linear-gradient(135deg, rgba(218, 101, 43, 0.08) 0%, rgba(26, 18, 14, 0.03) 100%);
+  border: 1px dashed rgba(218, 101, 43, 0.3);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  margin-bottom: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+body.dark .oracle-banner {
+  background: linear-gradient(135deg, rgba(224, 125, 59, 0.08) 0%, rgba(19, 15, 12, 0.8) 100%);
+  border-color: rgba(224, 125, 59, 0.25);
+}
+
+.oracle-banner:hover {
+  border-color: var(--accent);
+  box-shadow: 0 8px 24px var(--glow-color);
+  transform: translateY(-1px);
+}
+
+.oracle-banner-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.oracle-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+}
+
+.oracle-banner-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.oracle-banner-desc {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 600px;
+}
+
+.oracle-banner-btn {
+  background: transparent;
+  border: 1.5px solid var(--accent);
+  color: var(--accent);
+  border-radius: var(--radius-full);
+  padding: 10px 24px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.25s ease;
+}
+
+.oracle-banner-btn:hover {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
+}
+
+/* Oracle Modal Chamber */
+.oracle-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--ground);
+  z-index: 260;
+  display: none;
+  flex-direction: column;
+  animation: page-mount 450ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.oracle-modal.active {
+  display: flex;
+}
+
+.oracle-modal-header {
+  padding: 20px 48px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background-color: var(--surface-glass);
+  backdrop-filter: blur(var(--glass-blur));
+  z-index: 10;
+}
+
+.oracle-modal-title {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
+.oracle-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 40px 48px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 32px;
+}
+
+.oracle-instructions {
+  font-family: var(--font-accent);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Tarot Card Layout and Mechanics */
+.tarot-spread {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  width: 100%;
+  max-width: 580px;
+  justify-content: center;
+  perspective: 1200px;
+}
+
+.tarot-card-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.tarot-card-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tarot-card {
+  width: 150px;
+  height: 230px;
+  cursor: pointer;
+}
+
+.tarot-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.tarot-card.flipped .tarot-card-inner {
+  transform: rotateY(180deg);
+}
+
+.tarot-card-back, .tarot-card-front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+}
+
+.tarot-card-back {
+  background: linear-gradient(135deg, #18130e 0%, #070504 100%);
+  border-color: rgba(var(--accent-rgb), 0.25);
+  color: var(--accent);
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.tarot-card:hover .tarot-card-back {
+  border-color: var(--accent);
+  box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.25);
+}
+
+.tarot-symbol {
+  font-size: 28px;
+  animation: float-gently 3s ease-in-out infinite alternate;
+}
+
+.tarot-card-front {
+  background-color: var(--surface);
+  transform: rotateY(180deg);
+  border-color: var(--border);
+  color: var(--text);
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-md);
+}
+
+.tarot-card-archetype {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 600;
+}
+
+.tarot-card-monogram {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-style: italic;
+  font-weight: 700;
+  opacity: 0.15;
+  color: var(--accent);
+  line-height: 1;
+}
+
+.tarot-card-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Prophecy Section */
+.oracle-prophecy {
+  width: 100%;
+  max-width: 580px;
+  background-color: rgba(var(--text-rgb), 0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.prophecy-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.prophecy-text {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 500px;
+  min-height: 48px;
+}
+
+.manifest-recipe-btn {
+  background: linear-gradient(135deg, var(--accent) 0%, #ff8a48 100%);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-full);
+  padding: 12px 32px;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.2);
+}
+
+.manifest-recipe-btn:disabled {
+  background: var(--muted);
+  opacity: 0.3;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.manifest-recipe-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.35);
+}
+
+/* Animations */
+@keyframes float-gently {
+  0% { transform: translateY(0) scale(1); }
+  100% { transform: translateY(-6px) scale(1.05); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 767px) {
+  .oracle-banner {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: center;
+    padding: 20px;
+    gap: 16px;
+  }
+  .oracle-banner-btn {
+    width: 100%;
+  }
+  .oracle-modal-header {
+    padding: 16px 20px;
+  }
+  .oracle-modal-content {
+    padding: 24px 20px;
+    gap: 24px;
+  }
+  .tarot-spread {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 200px;
+  }
+  .tarot-card {
+    width: 140px;
+    height: 200px;
+  }
+}
+
