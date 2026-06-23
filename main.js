@@ -21,7 +21,29 @@ const state = {
   currentModalRecipe: null,
   activePage: "page-discover",
   oracleSelectedCards: [],
-  oracleFlippedCards: [false, false, false]
+  oracleFlippedCards: [false, false, false],
+  journal: [
+    {
+      date: "04 Jun — Fire & Aromatic boundary lines",
+      title: "The Charring of Aubergines",
+      excerpt: "Charring aubergines directly over carbon flame releases volatile syringol compounds, generating an intensely smoky, woodland aroma. In Mediterranean minimalism, this heavy smokiness demands a balancing emulsifier like sesame fat (tahini) and the raw, stinging acidity of fresh lemon."
+    },
+    {
+      date: "02 Jun — The acidity axis in pan roasting",
+      title: "Glazing with Vinegar and Wild Honey",
+      excerpt: "When caramelizing winter vegetables like fennel, wild honey adds sugar complexes that brown rapidly. Introducing vinegar does not just cut the heavy sweetness, it halts the caramelization process, trapping volatile botanical oils within a velvety emulsion."
+    },
+    {
+      date: "29 May — Cold extraction dynamics",
+      title: "The Patient Extraction of Kombu & Shiitake",
+      excerpt: "Simmering kombu extracts bitter alginates that muddy the palate. A cold-water steep over 8 hours yields clean glutamic acids without any bitter top notes. When heated, keep it below 80°C to preserve the purity of this oceanic-woodland broth."
+    }
+  ],
+  labActive: false,
+  labRecipe: null,
+  labCurrentStep: 0,
+  labTimerSeconds: 0,
+  labTimerInterval: null
 };
 
 // --- INITIALIZATION ---
@@ -49,7 +71,8 @@ function saveStateToStorage() {
   localStorage.setItem("mealmagic_state", JSON.stringify({
     onboarding: state.onboarding,
     pantry: state.pantry,
-    savedRecipeIds: state.savedRecipeIds
+    savedRecipeIds: state.savedRecipeIds,
+    journal: state.journal
   }));
 }
 
@@ -62,6 +85,7 @@ function loadStateFromStorage() {
       if (parsed.onboarding) state.onboarding = parsed.onboarding;
       if (parsed.pantry) state.pantry = parsed.pantry;
       if (parsed.savedRecipeIds) state.savedRecipeIds = parsed.savedRecipeIds;
+      if (parsed.journal) state.journal = parsed.journal;
     } catch (e) {
       console.error("Failed to parse local storage state", e);
     }
@@ -698,25 +722,12 @@ function setupJournalPage() {
   const container = document.getElementById("journal-container");
   if (!container) return;
 
-  const entries = [
-    {
-      date: "04 Jun — Fire & Aromatic boundary lines",
-      title: "The Charring of Aubergines",
-      excerpt: "Charring aubergines directly over carbon flame releases volatile syringol compounds, generating an intensely smoky, woodland aroma. In Mediterranean minimalism, this heavy smokiness demands a balancing emulsifier like sesame fat (tahini) and the raw, stinging acidity of fresh lemon."
-    },
-    {
-      date: "02 Jun — The acidity axis in pan roasting",
-      title: "Glazing with Vinegar and Wild Honey",
-      excerpt: "When caramelizing winter vegetables like fennel, wild honey adds sugar complexes that brown rapidly. Introducing vinegar does not just cut the heavy sweetness, it halts the caramelization process, trapping volatile botanical oils within a velvety emulsion."
-    },
-    {
-      date: "29 May — Cold extraction dynamics",
-      title: "The Patient Extraction of Kombu & Shiitake",
-      excerpt: "Simmering kombu extracts bitter alginates that muddy the palate. A cold-water steep over 8 hours yields clean glutamic acids without any bitter top notes. When heated, keep it below 80°C to preserve the purity of this oceanic-woodland broth."
-    }
-  ];
+  if (!state.journal || state.journal.length === 0) {
+    container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-family: var(--font-accent); padding: 40px 0;">No laboratory findings logged yet. Complete a cooking synthesis to archive reflections.</div>`;
+    return;
+  }
 
-  container.innerHTML = entries.map((entry, index) => {
+  container.innerHTML = state.journal.map((entry, index) => {
     return `<div class="journal-post stagger-${(index % 5) + 1}">
       <div class="journal-date">${entry.date}</div>
       <h3 class="journal-title">${entry.title}</h3>
@@ -819,6 +830,7 @@ function setupModal() {
   const closeBtn = document.getElementById("close-modal-btn");
   const modal = document.getElementById("recipe-modal-view");
   const saveBtn = document.getElementById("recipe-modal-save-btn");
+  const startPrepBtn = document.getElementById("start-prep-btn");
 
   closeBtn.addEventListener("click", () => {
     modal.classList.remove("active");
@@ -831,6 +843,15 @@ function setupModal() {
       renderRecipeCards(curatedRecipes, "recipe-list-container");
     }
   });
+
+  if (startPrepBtn) {
+    startPrepBtn.addEventListener("click", () => {
+      if (state.currentModalRecipe) {
+        modal.classList.remove("active");
+        openLaboratory(state.currentModalRecipe);
+      }
+    });
+  }
 }
 
 function openRecipeDetail(recipe) {
@@ -882,6 +903,248 @@ function openRecipeDetail(recipe) {
 function capitalize(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// --- LABORATORY MODE ---
+function openLaboratory(recipe) {
+  state.labActive = true;
+  state.labRecipe = recipe;
+  state.labCurrentStep = 0;
+  
+  document.getElementById("lab-recipe-title").textContent = recipe.title;
+  
+  const modal = document.getElementById("laboratory-modal");
+  modal.classList.add("active");
+  
+  setupLabControls();
+  renderLabStep();
+}
+
+function setupLabControls() {
+  const closeBtn = document.getElementById("close-lab-btn");
+  const prevBtn = document.getElementById("lab-prev-btn");
+  const nextBtn = document.getElementById("lab-next-btn");
+  
+  const newCloseBtn = closeBtn.cloneNode(true);
+  closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+  
+  const newPrevBtn = prevBtn.cloneNode(true);
+  prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+  
+  const newNextBtn = nextBtn.cloneNode(true);
+  nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+  
+  newCloseBtn.addEventListener("click", () => {
+    if (confirm("Exit cooking session? Your progress will be lost.")) {
+      exitLaboratory();
+    }
+  });
+  
+  newPrevBtn.addEventListener("click", () => {
+    if (state.labCurrentStep > 0) {
+      state.labCurrentStep--;
+      renderLabStep();
+    }
+  });
+  
+  newNextBtn.addEventListener("click", () => {
+    const totalSteps = state.labRecipe.steps.length + 2;
+    if (state.labCurrentStep === totalSteps - 1) {
+      archiveLabJournalEntry();
+    } else {
+      state.labCurrentStep++;
+      renderLabStep();
+    }
+  });
+}
+
+function exitLaboratory() {
+  state.labActive = false;
+  state.labRecipe = null;
+  state.labCurrentStep = 0;
+  
+  if (state.labTimerInterval) {
+    clearInterval(state.labTimerInterval);
+    state.labTimerInterval = null;
+  }
+  
+  document.getElementById("laboratory-modal").classList.remove("active");
+}
+
+function renderLabStep() {
+  const stepIndicator = document.getElementById("lab-step-indicator");
+  const stepBody = document.getElementById("lab-step-body");
+  const prevBtn = document.getElementById("lab-prev-btn");
+  const nextBtn = document.getElementById("lab-next-btn");
+  const progressBar = document.getElementById("lab-progress-bar");
+  
+  const recipe = state.labRecipe;
+  const steps = recipe.steps;
+  const totalSteps = steps.length + 2;
+  
+  const progressPercent = (state.labCurrentStep / (totalSteps - 1)) * 100;
+  progressBar.style.width = `${progressPercent}%`;
+  
+  if (state.labCurrentStep === 0) {
+    stepIndicator.textContent = "Reagent Verification";
+  } else if (state.labCurrentStep === totalSteps - 1) {
+    stepIndicator.textContent = "Alchemical Manifestation";
+  } else {
+    stepIndicator.textContent = `Synthesis Step ${String(state.labCurrentStep).padStart(2, '0')} of ${String(steps.length).padStart(2, '0')}`;
+  }
+  
+  prevBtn.disabled = state.labCurrentStep === 0;
+  
+  if (state.labTimerInterval) {
+    clearInterval(state.labTimerInterval);
+    state.labTimerInterval = null;
+  }
+  
+  if (state.labCurrentStep === 0) {
+    prevBtn.style.display = "block";
+    nextBtn.textContent = "Begin Synthesis";
+    nextBtn.disabled = true;
+    
+    let checklistHtml = `
+      <h3 class="lab-checklist-title">Verify Reagents</h3>
+      <p class="lab-checklist-desc">Confirm all required elements are collected on your work surface.</p>
+      <div class="lab-checklist-grid">
+    `;
+    
+    recipe.ingredients.forEach((ing, i) => {
+      checklistHtml += `
+        <label class="lab-checklist-item">
+          <input type="checkbox" class="lab-ingredient-check" data-index="${i}">
+          <span>${capitalize(ing)}</span>
+        </label>
+      `;
+    });
+    
+    checklistHtml += `</div>`;
+    stepBody.innerHTML = checklistHtml;
+    
+    const checks = document.querySelectorAll(".lab-ingredient-check");
+    checks.forEach(check => {
+      check.addEventListener("change", () => {
+        const allChecked = Array.from(checks).every(c => c.checked);
+        nextBtn.disabled = !allChecked;
+      });
+    });
+    
+  } else if (state.labCurrentStep === totalSteps - 1) {
+    nextBtn.textContent = "Archive & Finish";
+    nextBtn.disabled = false;
+    
+    const defaultLogText = `Prepared ${recipe.title}. The alchemical blending of ingredients was successful. Adjustments made: [Enter notes here]`;
+    
+    stepBody.innerHTML = `
+      <div class="lab-success-emblem">✦</div>
+      <h3 class="lab-checklist-title" style="margin-bottom: 4px;">Synthesis Complete</h3>
+      <p class="lab-checklist-desc" style="margin-bottom: 16px;">The flavor composition has solidified. Log your laboratory notes.</p>
+      <textarea class="lab-journal-textarea" id="lab-journal-notes" placeholder="Write reflections here...">${defaultLogText}</textarea>
+    `;
+    
+  } else {
+    nextBtn.textContent = (state.labCurrentStep === totalSteps - 2) ? "Complete Preparation" : "Next Step";
+    nextBtn.disabled = false;
+    
+    const stepText = steps[state.labCurrentStep - 1];
+    
+    let stepHtml = `
+      <p class="lab-step-text">${stepText}</p>
+    `;
+    
+    const minutesMatch = stepText.match(/(\d+)\s*(?:minute|min)/i);
+    if (minutesMatch) {
+      const minutes = parseInt(minutesMatch[1]);
+      state.labTimerSeconds = minutes * 60;
+      
+      stepHtml += `
+        <div class="lab-timer-widget">
+          <div class="lab-timer-display" id="lab-timer-display">${formatTimerTime(state.labTimerSeconds)}</div>
+          <div class="lab-timer-controls">
+            <button class="lab-timer-btn" id="lab-timer-toggle">Start Timer</button>
+            <button class="lab-timer-btn" id="lab-timer-reset">Reset</button>
+          </div>
+        </div>
+      `;
+    }
+    
+    stepBody.innerHTML = stepHtml;
+    
+    const timerToggle = document.getElementById("lab-timer-toggle");
+    const timerReset = document.getElementById("lab-timer-reset");
+    
+    if (timerToggle && timerReset) {
+      timerToggle.addEventListener("click", () => {
+        if (state.labTimerInterval) {
+          clearInterval(state.labTimerInterval);
+          state.labTimerInterval = null;
+          timerToggle.textContent = "Start Timer";
+          timerToggle.classList.remove("active");
+        } else {
+          timerToggle.textContent = "Pause Timer";
+          timerToggle.classList.add("active");
+          
+          state.labTimerInterval = setInterval(() => {
+            if (state.labTimerSeconds > 0) {
+              state.labTimerSeconds--;
+              document.getElementById("lab-timer-display").textContent = formatTimerTime(state.labTimerSeconds);
+            } else {
+              clearInterval(state.labTimerInterval);
+              state.labTimerInterval = null;
+              timerToggle.textContent = "Finished";
+              timerToggle.disabled = true;
+              timerToggle.classList.remove("active");
+              document.getElementById("lab-timer-display").style.color = "var(--accent)";
+            }
+          }, 1000);
+        }
+      });
+      
+      timerReset.addEventListener("click", () => {
+        if (state.labTimerInterval) {
+          clearInterval(state.labTimerInterval);
+          state.labTimerInterval = null;
+        }
+        state.labTimerSeconds = minutes * 60;
+        document.getElementById("lab-timer-display").textContent = formatTimerTime(state.labTimerSeconds);
+        timerToggle.textContent = "Start Timer";
+        timerToggle.disabled = false;
+        timerToggle.classList.remove("active");
+        document.getElementById("lab-timer-display").style.color = "var(--accent)";
+      });
+    }
+  }
+}
+
+function formatTimerTime(totalSeconds) {
+  const mins = Math.floor(totalSeconds / 60);
+  const secs = totalSeconds % 60;
+  return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+}
+
+function archiveLabJournalEntry() {
+  const notesArea = document.getElementById("lab-journal-notes");
+  const text = notesArea ? notesArea.value.trim() : "";
+  
+  if (text) {
+    const today = new Date();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const dateStr = `${String(today.getDate()).padStart(2, '0')} ${months[today.getMonth()]} — Alchemical Cook Log`;
+    
+    const newEntry = {
+      date: dateStr,
+      title: state.labRecipe.title,
+      excerpt: text
+    };
+    
+    state.journal.unshift(newEntry);
+    saveStateToStorage();
+    setupJournalPage();
+  }
+  
+  exitLaboratory();
 }
 
 // --- MYSTICAL CULINARY ORACLE ---
