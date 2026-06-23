@@ -25,12 +25,18 @@ A comprehensive record of the project state, architecture, design decisions, and
 
 ```
 mealmagic/
-├── index.html          # Core SPA shell (pages, modals, onboarding, responsive navigation)
-├── main.js            # App initialization, state manager, page router, UI event listeners
-├── recipes.js         # Curated recipes, ingredient pairings database, custom recipe generator
-├── style.css          # Design system, fluid layout, responsive breakpoints, dark/light themes
-├── package.json       # Project metadata and development dependencies
-└── favicon.svg        # Scalable application icon
+├── index.html            # Core SPA shell (pages, modals, onboarding, responsive navigation)
+├── main.js              # App initialization, state manager, page router, UI event listeners
+├── recipes.js           # Curated recipes, ingredient pairings database, custom recipe generator
+├── style.css            # Design system, fluid layout, responsive breakpoints, dark/light themes
+├── package.json         # Project metadata and development dependencies
+├── favicon.svg          # Scalable application icon
+├── .gitignore           # File and directory exclusions for Git
+├── .editorconfig        # Formatting standards (indentation, line breaks)
+├── .prettierrc          # Prettier rules for JS and CSS files
+├── CONTRIBUTING.md      # Guidelines for contributing developers
+├── memory.md            # Comprehensive development record (avoiding context drift)
+└── README.md            # Detailed setup instructions and project documentation
 ```
 
 ### Core State Schema (`main.js`):
