@@ -19,7 +19,9 @@ const state = {
   ],
   savedRecipeIds: [],
   currentModalRecipe: null,
-  activePage: "page-discover"
+  activePage: "page-discover",
+  oracleSelectedCards: [],
+  oracleFlippedCards: [false, false, false]
 };
 
 // --- INITIALIZATION ---
@@ -34,6 +36,7 @@ document.addEventListener("DOMContentLoaded", () => {
   setupJournalPage();
   setupProfilePage();
   setupModal();
+  setupOracle();
   updateTimeGreeting();
   
   // Position search controls based on viewport
@@ -879,4 +882,146 @@ function openRecipeDetail(recipe) {
 function capitalize(str) {
   if (!str) return "";
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// --- MYSTICAL CULINARY ORACLE ---
+const ORACLE_CARDS = [
+  { title: "Rosemary", monogram: "R", archetype: "The Altar", type: "base", desc: "purifying and focusing, grounding the dish with its woodsy, evergreen warmth." },
+  { title: "Olive Oil", monogram: "O", archetype: "The Elixir", type: "base", desc: "smooth and fluid, carrying flavors across boundaries and coating the palate." },
+  { title: "Garlic", monogram: "G", archetype: "The Anchor", type: "base", desc: "savory intensity, providing the deep, pungent foundation of the culinary circle." },
+  { title: "Rosewater", monogram: "W", archetype: "The Bloom", type: "base", desc: "delicate and floral, raising the ingredients into a higher sensory, etheric realm." },
+  
+  { title: "Honey", monogram: "H", archetype: "The Catalyst", type: "flavor", desc: "warm and sweet, binding bitter elements and creating smooth, golden attraction." },
+  { title: "Lemon", monogram: "L", archetype: "The Spark", type: "flavor", desc: "acidic and bright, cutting through shadows and waking the sleeping senses." },
+  { title: "Chili", monogram: "C", archetype: "The Friction", type: "flavor", desc: "fiery heat, accelerating blood circulation and transforming flavor perception." },
+  { title: "Cacao", monogram: "K", archetype: "The Shadow", type: "flavor", desc: "bittersweet complexity, adding mysterious depths and rich, dark structure." },
+  
+  { title: "Sea Salt", monogram: "S", archetype: "The Whisper", type: "accent", desc: "crystalline mineral clarity, multiplying and emphasizing hidden flavor notes." },
+  { title: "Black Pepper", monogram: "P", archetype: "The Spike", type: "accent", desc: "sharp heat, puncturing density and leaving a lingering, warm spark on the tongue." },
+  { title: "Pistachio", monogram: "T", archetype: "The Gem", type: "accent", desc: "crunchy and rich, a hidden nutty jewel that rewards the curious bite." },
+  { title: "Mint", monogram: "M", archetype: "The Breeze", type: "accent", desc: "cool release, clearing the senses and completing the alchemical cycle." }
+];
+
+function setupOracle() {
+  const openBtn = document.getElementById("open-oracle-btn");
+  const closeBtn = document.getElementById("close-oracle-btn");
+  const modal = document.getElementById("oracle-modal");
+  const manifestBtn = document.getElementById("manifest-recipe-btn");
+  const cards = document.querySelectorAll(".tarot-card");
+
+  if (!openBtn || !closeBtn || !modal) return;
+
+  openBtn.addEventListener("click", () => {
+    const bases = ORACLE_CARDS.filter(c => c.type === "base");
+    const flavors = ORACLE_CARDS.filter(c => c.type === "flavor");
+    const accents = ORACLE_CARDS.filter(c => c.type === "accent");
+
+    const baseCard = bases[Math.floor(Math.random() * bases.length)];
+    const flavorCard = flavors[Math.floor(Math.random() * flavors.length)];
+    const accentCard = accents[Math.floor(Math.random() * accents.length)];
+
+    state.oracleSelectedCards = [baseCard, flavorCard, accentCard];
+    state.oracleFlippedCards = [false, false, false];
+
+    cards.forEach((card, idx) => {
+      card.classList.remove("flipped");
+      const front = card.querySelector(".tarot-card-front");
+      if (front) {
+        front.querySelector(".tarot-card-archetype").textContent = state.oracleSelectedCards[idx].archetype;
+        front.querySelector(".tarot-card-monogram").textContent = state.oracleSelectedCards[idx].monogram;
+        front.querySelector(".tarot-card-title").textContent = state.oracleSelectedCards[idx].title;
+      }
+    });
+
+    document.getElementById("prophecy-text").textContent = "Focus on your culinary intent, then click each card to reveal the omen...";
+    manifestBtn.disabled = true;
+    modal.classList.add("active");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    modal.classList.remove("active");
+  });
+
+  cards.forEach(card => {
+    card.addEventListener("click", () => {
+      const idx = parseInt(card.getAttribute("data-index"));
+      if (state.oracleFlippedCards[idx]) return;
+
+      card.classList.add("flipped");
+      state.oracleFlippedCards[idx] = true;
+
+      const drawn = state.oracleSelectedCards[idx];
+      
+      if (state.oracleFlippedCards.every(f => f === true)) {
+        const [c1, c2, c3] = state.oracleSelectedCards;
+        const prophecy = `You have drawn ${c1.title} (${c1.archetype}), ${c2.title} (${c2.archetype}), and ${c3.title} (${c3.archetype}). This combination represents a culinary union of structure, transformation, and enhancement. The ${c1.title} acts as your vessel, ${c2.title} sparks the transformation, and ${c3.title} seals the connection.`;
+        document.getElementById("prophecy-text").textContent = prophecy;
+        manifestBtn.disabled = false;
+      } else {
+        document.getElementById("prophecy-text").textContent = `Revealed ${drawn.title} (${drawn.archetype}): ${drawn.desc}`;
+      }
+    });
+  });
+
+  manifestBtn.addEventListener("click", () => {
+    modal.classList.remove("active");
+    const [c1, c2, c3] = state.oracleSelectedCards;
+    const recipeId = `recipe-oracle-${Date.now()}`;
+    
+    const titles = {
+      "Rosemary": {
+        "Honey": { "Sea Salt": "Nectar of the Pine Grove", "Black Pepper": "Hearthfire Rosemary Glaze", "Pistachio": "Encrusted Altar Crust", "Mint": "Herbal Meadow Dew" },
+        "Lemon": { "Sea Salt": "Ethereal Rosemary Citron", "Black Pepper": "Spiked Lemon Needle Tea", "Pistachio": "Crushed Gem Citronade", "Mint": "Green Wind Infusion" },
+        "Chili": { "Sea Salt": "Flame-Seared Pine Confit", "Black Pepper": "Spiced Rosemary Embers", "Pistachio": "Fiery Emerald Relish", "Mint": "Chili Mint Sage Infusion" },
+        "Cacao": { "Sea Salt": "Shadowed Rosemary Reduction", "Black Pepper": "Cacao Needle Confit", "Pistachio": "Alchemical Cacao Crust", "Mint": "Dark Herbal Ganache" }
+      },
+      "Olive Oil": {
+        "Honey": { "Sea Salt": "Emulsified Golden Nectar", "Black Pepper": "Glazed Pepper Elixir", "Pistachio": "Pistachio Honey Paste", "Mint": "Sweet Mint Dressing" },
+        "Lemon": { "Sea Salt": "Luminous Citron Emulsion", "Black Pepper": "Lemon Pepper Vinaigrette", "Pistachio": "Nutty Citron Oil", "Mint": "Breeze Lemon Drizzle" },
+        "Chili": { "Sea Salt": "Fiery Amber Condiment", "Black Pepper": "Peppery Chili Glaze", "Pistachio": "Spiced Nut Paste", "Mint": "Chili Herb Infusion" },
+        "Cacao": { "Sea Salt": "Earthy Velvet Emulsion", "Black Pepper": "Dark Pepper Oil", "Pistachio": "Rich Cacao Spread", "Mint": "Dark Mint Infusion" }
+      },
+      "Garlic": {
+        "Honey": { "Sea Salt": "Golden Sweet Garlic Confit", "Black Pepper": "Black Pepper Garlic Glaze", "Pistachio": "Garlic Pistachio Butter", "Mint": "Garlic Sweet Herb Oil" },
+        "Lemon": { "Sea Salt": "Zesty Garlic Aioli", "Black Pepper": "Peppery Lemon Garlic Butter", "Pistachio": "Garlic Pistachio Pesto", "Mint": "Lemon Garlic Mint Oil" },
+        "Chili": { "Sea Salt": "Toum of the Sun-Gazer", "Black Pepper": "Blackened Garlic Butter", "Pistachio": "Chili Garlic Tapenade", "Mint": "Spiced Garlic Emulsion" },
+        "Cacao": { "Sea Salt": "Mole of the Deep Hearth", "Black Pepper": "Spiced Cacao Garlic Glaze", "Pistachio": "Dark Nutty Pesto", "Mint": "Garlic Cacao Jus" }
+      },
+      "Rosewater": {
+        "Honey": { "Sea Salt": "Dew of the Persian Gardens", "Black Pepper": "Spiced Rose Syrup", "Pistachio": "Rosewater Pistachio Halva", "Mint": "Floral Mint Elixir" },
+        "Lemon": { "Sea Salt": "Ethereal Rose Sherbet", "Black Pepper": "Zesty Rose Reduction", "Pistachio": "Rosewater Nut Crumble", "Mint": "Rose Citron Breeze" },
+        "Chili": { "Sea Salt": "Fiery Rose Syrup", "Black Pepper": "Spiced Rose Compote", "Pistachio": "Spicy Pistachio Delicacy", "Mint": "Chili Rosewater Coulis" },
+        "Cacao": { "Sea Salt": "Celestial Rose Ganache", "Black Pepper": "Spiced Rose Cacao", "Pistachio": "Rose Pistachio Fudge", "Mint": "Rosewater Mint Truffle" }
+      }
+    };
+
+    const title = titles[c1.title]?.[c2.title]?.[c3.title] || `Alchemical ${c1.title} & ${c2.title} Medley`;
+
+    const generatedRecipe = {
+      id: recipeId,
+      title: title,
+      cuisine: "Alchemical",
+      time: "25 min",
+      servings: "2 servings",
+      description: `A unique gastronomic manifest drawn from the Oracle. This alchemical creation binds ${c1.title} (${c1.archetype}) as the foundation, transforms it with ${c2.title} (${c2.archetype}), and crowns it with the accent of ${c3.title} (${c3.archetype}).`,
+      imageBg: "#17120e",
+      flavorNote: `${c2.type.toUpperCase()} & ${c3.type.toUpperCase()}`,
+      ingredients: [
+        `3 parts ${c1.title.toLowerCase()}`,
+        `1 part ${c2.title.toLowerCase()}`,
+        `A generous pinch of ${c3.title.toLowerCase()}`,
+        "High-quality culinary water or olive oil",
+        "Assorted companion pantry items of choice"
+      ],
+      steps: [
+        `Prepare the foundation: Warm and activate the ${c1.title.toLowerCase()} to capture its full essence as the core ${c1.archetype.toLowerCase()}.`,
+        `Introduce the catalyst: Slowly incorporate the ${c2.title.toLowerCase()} to harmonize the flavors and stimulate chemical bonding.`,
+        `Apply the final seal: Remove from heat and scatter the ${c3.title.toLowerCase()} as the finishing ${c3.archetype.toLowerCase()} to elevate and preserve the dish.`,
+        "Serve in a quiet environment, appreciating the cosmic pairings of the ingredients."
+      ]
+    };
+
+    curatedRecipes.push(generatedRecipe);
+    openRecipeDetail(generatedRecipe);
+  });
 }
