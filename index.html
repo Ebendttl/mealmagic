@@ -481,6 +481,8 @@
         Charred aubergine flesh emulsified with toasted sesame paste, finished with cold-pressed olive oil.
       </p>
       
+      <button class="start-prep-btn" id="start-prep-btn">✦ Begin Preparation (Lab Mode)</button>
+      
       <h3 class="recipe-detail-section-title">Ingredients</h3>
       <div class="recipe-detail-ingredients" id="modal-ingredients-list">
         <!-- Populated dynamically -->
@@ -562,6 +564,39 @@
         <div class="prophecy-title">The Culinary Prophecy</div>
         <p class="prophecy-text" id="prophecy-text">Select and flip your cards to begin the consultation...</p>
         <button class="manifest-recipe-btn" id="manifest-recipe-btn" disabled>✦ Manifest Alchemical Recipe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LABORATORY MODE MODAL (Step-by-step Cooking Companion) -->
+  <div class="laboratory-modal" id="laboratory-modal">
+    <div class="lab-modal-header">
+      <div class="lab-recipe-info">
+        <span class="lab-modal-badge">✦ Active Laboratory Synthesis</span>
+        <h2 class="lab-recipe-title" id="lab-recipe-title">Smoked Aubergine & Sesame</h2>
+      </div>
+      <button class="modal-close-btn" id="close-lab-btn" aria-label="Exit Laboratory">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+      </button>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="lab-progress-container">
+      <div class="lab-progress-bar" id="lab-progress-bar"></div>
+    </div>
+
+    <div class="lab-modal-content">
+      <div class="lab-step-indicator" id="lab-step-indicator">STEP 01 OF 05</div>
+      
+      <!-- Dynamic Step Content Area -->
+      <div class="lab-step-body" id="lab-step-body">
+        <!-- Will be populated dynamically -->
+      </div>
+
+      <!-- Navigation Footer -->
+      <div class="lab-navigation">
+        <button class="lab-nav-btn prev" id="lab-prev-btn">Back</button>
+        <button class="lab-nav-btn next" id="lab-next-btn">Next Step</button>
       </div>
     </div>
   </div>
