@@ -797,12 +797,18 @@ function renderProfilePage() {
   }
   
   if (state.onboarding.skill) {
-    affinitiesList.innerHTML += `<span class="affinity-tag" style="border-color: var(--accent); color: var(--accent); opacity: 0.8;">${state.onboarding.skill}</span>`;
+    affinitiesList.innerHTML += `<span class="affinity-tag spec-skill" style="border-color: var(--accent); color: var(--accent); opacity: 0.8;">${state.onboarding.skill}</span>`;
     
     // Update user subtitle in sidebar
     const sidebarTitle = document.querySelector(".sidebar-usertitle");
     if (sidebarTitle) sidebarTitle.textContent = state.onboarding.skill;
   }
+
+  // Populate dynamic stats
+  const pantryCount = document.getElementById("stat-pantry-count");
+  const savedCount = document.getElementById("stat-saved-count");
+  if (pantryCount) pantryCount.textContent = state.pantry.length;
+  if (savedCount) savedCount.textContent = state.savedRecipeIds.length;
 }
 
 // --- RECIPE MODAL DETAILS ---
